@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = require("./config/config");
 const Post_routes_1 = __importDefault(require("./routes/Post.routes"));
-const Post_routes_2 = __importDefault(require("./routes/Post.routes"));
+const cors = require("cors");
 const port = 8000;
 const app = (0, express_1.default)();
 mongoose_1.default
@@ -20,13 +20,18 @@ mongoose_1.default
     .catch((err) => {
     console.log("ERR: ", err);
 });
-app.get("/", (req, res) => {
-    res.send("server up! s @! ssd");
-});
 const startServer = () => {
     app.use(express_1.default.urlencoded({ extended: true }));
     app.use(express_1.default.json());
-    Post_routes_1.default.use("/posts", Post_routes_2.default);
+    app.use(function (req, res, next) {
+        res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+        res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+        next();
+    });
+    // routes
+    app.use("/posts", Post_routes_1.default);
     app.listen(port, () => {
         console.log("listening on port", port);
     });

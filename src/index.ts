@@ -1,8 +1,9 @@
 import express, { Express, Request, Response, Router } from "express";
 import mongoose from "mongoose";
 import { config } from "./config/config";
-import router from "./routes/Post.routes";
 import postRoutes from "./routes/Post.routes";
+const cors = require("cors");
+
 const port = 8000;
 const app = express();
 
@@ -18,15 +19,26 @@ mongoose
     console.log("ERR: ", err);
   });
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("server up! s @! ssd");
-});
-
 const startServer = () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
-  router.use("/posts", postRoutes);
+  app.use(function (req, res, next) {
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "X-Requested-With,content-type"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    next();
+  });
+
+  // routes
+  app.use("/posts", postRoutes);
 
   app.listen(port, () => {
     console.log("listening on port", port);
